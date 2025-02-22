@@ -1,0 +1,26 @@
+{
+    "name": "programmer9wc/query_builder",
+    "license": "MIT",
+    "description" : "Query Builder for Laravel",
+    "authors": [
+        {
+            "name": "Programmer9",
+            "email": "programmer9@webbycrown.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "Programmer9WC\\QueryBuilder\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Programmer9WC\\QueryBuilder\\Providers\\QueryBuilderServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "minimum-stability": "dev"
+}
