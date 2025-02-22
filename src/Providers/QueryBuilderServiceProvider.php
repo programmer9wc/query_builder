@@ -15,7 +15,13 @@ class QueryBuilderServiceProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        //
+        
+        $this->loadRoutesFrom(__DIR__ . '/../Routes/web.php');
+
+        $this->loadViewsFrom(__DIR__ . '/../Resources/views', 'wc_querybuilder');
+
+        require_once __DIR__ . '/../Helpers/helpers.php';
+
     }
     
     /**

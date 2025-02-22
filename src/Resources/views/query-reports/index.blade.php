@@ -1,0 +1,176 @@
+@extends('wc_querybuilder::layout')
+
+@section('css')
+
+<style type="text/css">
+
+</style>
+
+@endsection
+
+@section('content')
+
+<div class="d-flex justify-content-between">
+    <h2>Query Reports</h2>
+    <div>
+        <a href="{{ route( 'query-builder.index' ) }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Query</a>
+    </div>
+</div>
+
+<table id="reportsTable" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Reports</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+<!-- Modal -->
+{{-- <div class="modal fade" id="addRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="#" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addRecordModalLabel">Add New Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div> --}}
+
+
+@endsection
+
+@section('scripts')
+
+<script>
+
+    @if(Session::has('success'))
+    toastr.success("{{ Session::get('success') }}");
+    @endif
+
+    @if(Session::has('error'))
+    toastr.error("{{ Session::get('error') }}");
+    @endif
+
+
+    $(document).ready(function() {
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+
+        var reportDataTable = $('#reportsTable').DataTable({
+            processing: true,
+            bSort: true,
+            fixedHeder: true,
+            serverSide: true,
+            searchDelay: 2000,
+            stateSave: true,
+            order: [ [0, 'desc'] ],
+            preDrawCallback: function(settings) {
+                if ($.fn.DataTable.isDataTable('#reportsTable')) {
+                    var dt = $('#reportsTable').DataTable();
+
+                    //Abort previous ajax request if it is still in process.
+                    var settings = dt.settings();
+                    if (settings[0].jqXHR) {
+                        settings[0].jqXHR.abort();
+                    }
+                }
+            },
+            ajax: {
+                url: `{{url("/query-report")}}`,
+                type: "get",
+                data: function(d) {
+                    d._token = '{{ csrf_token() }}';
+                },
+            },
+            columns: [{
+                data: 'id',
+            },
+            {
+                data: 'title',
+            },
+            {
+                data: null,
+                orderable: false,
+                render: function(data, type, row) {
+                    let btns = "";
+
+                    var view_url = "{{ route( 'query-report.view', ['id'=>':id'] ) }}".replace(':id', row.id);
+                    var edit_url = "{{ route( 'query-report.edit', ['id'=>':id'] ) }}".replace(':id', row.id);
+
+                    btns += `<a class="btn btn-sm btn-primary m-1" title="View Reports" style="color: white;" href="${view_url}"><i class="fa-solid fa-right-to-bracket"></i></i></a>`;
+
+                    btns += `<a class="btn btn-sm btn-info m-1" title="Edit" style="color: white;"  href="${edit_url}"><i class="fas fa-edit"></i></a>`;
+                    
+                    btns += `<button class="btn btn-sm btn-danger m-1 report-delete" title="Delete" style="color: white;" data-id="${row.id}"><i class="fas fa-trash"></i></button>`;
+
+                    return btns;
+                }
+            }
+            ],
+            responsive: true,
+            stateSave: true
+        }).order([0, 'desc']);
+
+        // querySaveForm submission
+        $(document).on('click', '.report-delete', function(e) {
+            e.preventDefault();
+
+            var $this = $(this);
+            var id = $this.attr('data-id');
+
+            toastr.clear();
+
+            if ( confirm('Are you sure you want to delete this record?') ) {
+
+                $.ajax({
+                    url: `${site_url}/query-report/delete`,
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (response) {
+                        if ( response.result ) {
+                            toastr.success( response.message );
+                            reportDataTable.ajax.reload(null, false);
+
+                        } else if( !response.result ) {
+                            toastr.error( response.message );
+                        }
+                    },
+                    error: function (error) {
+                        toastr.error( error.responseJSON.message );
+                    }
+                });
+
+            }
+
+        });
+
+    });
+</script>
+
+@endsection

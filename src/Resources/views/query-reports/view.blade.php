@@ -1,0 +1,96 @@
+@extends('wc_querybuilder::layout')
+
+@section('css')
+
+<style type="text/css">
+
+    /*.table-container {
+        max-height: 650px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        position: sticky;
+        top: 0;
+        background: #f4f4f4;
+        z-index: 2;
+    }*/
+
+</style>
+
+@endsection
+
+@section('content')
+
+<div class="card">
+
+    <div class="card-header">
+        
+        <div class="d-flex justify-content-between">
+            <h2>{{ $query_form->title ?? 'View Query'}} Reports</h2>
+            <div>
+                <a href="{{ route( 'query-report.index' ) }}" class="btn btn-secondary">Back</a>
+                <a href="{{ route( 'query-report.edit', ['id' => ( (int)$query_form?->id ?? 0 )] ) }}" class="btn btn-primary">Edit</a>
+            </div>
+        </div>
+
+    </div>{{-- end card header --}}
+
+    <div class="card-body">
+        
+        <div class="mb-3">
+            <div id="resultsTable"></div>
+        </div>
+
+    </div> {{-- end card body --}}
+
+</div>
+
+
+@endsection
+
+@section('scripts')
+
+<script>
+
+    $(document).ready(function() {
+
+        var formData = @json($query_details);
+        formData = JSON.parse(formData);
+
+        var resultsTable = new Tabulator("#resultsTable", {
+            layout: "fitColumns",
+            ajaxURL: site_url + "/query-builder/search", // API endpoint
+            ajaxConfig: "GET",
+            ajaxParams: formData,
+            filterMode: "remote", // Remote filtering
+            pagination: true, // Enable pagination
+            paginationMode: "remote", // Remote pagination
+            paginationInitialPage: 1, // Initial page (default)
+            paginationSize: 10, // Number of rows per page
+            ajaxResponse: function (url, params, response) {
+
+                // Update columns dynamically
+                this.setColumns(response.columns);
+
+                // Return data to Tabulator
+                return response;
+            },
+        });
+
+    });
+</script>
+
+@endsection
