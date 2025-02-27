@@ -47,31 +47,6 @@
 
 @section('content')
 
-{{-- <button type="button" class="btn btn-primary btn-saveQueryModal" data-bs-toggle="modal" data-bs-target="#saveQueryModal" disabled>Save Query</button>
-<!-- Modal -->
-<div class="modal fade" id="saveQueryModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-        <form id="querySaveForm">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Save Query Builder</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-                <label>Title:</label>
-                <input type="text" name="title" placeholder="Enter Title" class="form-control mt-1" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Save</button>
-          </div>
-      </form>
-    </div>
-  </div>
-</div> --}}
-
 <div class="card">
     <div class="card-header">
 
@@ -170,12 +145,8 @@
                     </form>
 
                     <!-- Results -->
-                    {{-- <div class="mt-4 mb-3" id="resultsSummary" style="display: none;"></div> --}}
                     <div class="table-responsive mt-4">
-                        {{-- <table class="table" id="resultsTable">
-                            <thead><tr id="resultsHeader"></tr></thead>
-                            <tbody id="resultsBody"></tbody>
-                        </table> --}}
+                       
                         <div id="resultsTable"></div>
                     </div>
 
@@ -270,7 +241,6 @@
             $('#resultsSummary').css('display', 'none');
             $('#relationshipsList').html('');
             $('#joinsContainer').html('');
-            // $('#conditions').html('');
             $('#resultsSummary').html('');
             $('#resultsHeader').html('');
             $('#resultsBody').html('');
@@ -383,7 +353,6 @@
 
             if ( is_disable ) {
                 join_table_this.val('');
-                // alert( 'This table is already selected. Please choose a different join.' );
                 toastr.error('This table is already selected. Please choose a different join.');
             } else {
                 if (table) {
@@ -432,7 +401,6 @@
                             </label>
                         </div>
                     `;
-                                // ${column.comment ? `<small class="text-muted">(${column.comment})</small>` : ''}
                 });
                 columnHtml += `</div>`;
                 columnHtml += `</div>`;
@@ -512,56 +480,6 @@
         $(document).on('click', '.remove-condition', function() {
             $(this).closest('.condition-card').remove();
         });
-
-        // // Form submission
-        // $('#queryForm').submit(function(e) {
-        //     e.preventDefault();
-
-        //     var main_table = $('#mainTableSelect').val()
-        //     if ( !main_table ) {
-        //         toastr.error('Query details have not been selected.');
-        //         return;
-        //     }
-            
-        //     $('#resultsTable').closest('.table-responsive').append( '<div class="loader"></div>' );
-            
-        //     const formData = $(this).serializeArray();
-        //     $.post(`${site_url}/query-builder/search`, formData, function(response) {
-        //         $('#resultsTable').closest('.table-responsive').find('.loader').remove();
-        //         if (response.error) {
-        //             alert(response.message);
-        //             return;
-        //         }
-
-        //         /*$('#resultsSummary').html(`
-        //             <div class="alert alert-info">
-        //                 Found ${response.total_count} records matching your criteria.
-        //             </div>
-        //         `).show();*/
-
-        //         if (response.data.length > 0) {
-        //             // Add headers
-        //             const headers = Object.keys(response.data[0]);
-        //             const headerRow = headers.map(header => `<th>${header}</th>`).join('');
-        //             $('#resultsHeader').html(headerRow);
-
-        //             // Add data rows
-        //             const rows = response.data.map(row => {
-        //                 const cells = headers.map(header => 
-        //                     `<td>${row[header] !== null ? row[header] : ''}</td>`
-        //                 ).join('');
-        //                 return `<tr>${cells}</tr>`;
-        //             }).join('');
-        //             $('#resultsBody').html(rows);
-
-        //             $('#resultsTable').DataTable();
-        //         } else {
-        //             $('#resultsBody').html(`
-        //                 <tr><td colspan="100%" class="text-center">No results found</td></tr>
-        //             `);
-        //         }
-        //     });
-        // });
 
         // Form submission
         $('#queryForm').submit(function(e) {

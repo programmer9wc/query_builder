@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Namespace containing controller classes responsible for handling query builder operations.
+ */
+
 namespace Programmer9WC\QueryBuilder\Http\Controllers;
 
 use Illuminate\Routing\Controller;
@@ -11,39 +15,67 @@ class QueryBuilderController extends Controller
 {
     protected $conn_key;
 
+    /**
+     * Constructor to initialize the database connection.
+     */
     public function __construct()
     {
         $this->conn_key = connect_to_manage_db();
     }
 
+    /**
+     * Display the query report page.
+     *
+     * @return \Illuminate\View\View The query report edit view.
+     */
     public function index()
     {
+        // Initialize query-related variables
         $query_form = null;
         $query_details = [];
+        // Fetch the list of tables from the database
         $tables = get_table_list($this->conn_key);
+
+        // Fetch additional table metadata including comments
         $tables_data = get_table_list_with_comment($this->conn_key);
+
+        // Return the view with retrieved data
 
         return view('wc_querybuilder::query-reports.edit', compact('tables', 'query_form', 'query_details', 'tables_data'));
     }
 
+    /**
+     * Retrieve foreign key relationships for a given table.
+     *
+     * @param string $table The name of the database table.
+     * @return \Illuminate\Http\JsonResponse JSON response containing the table relationships.
+     */
     public function getRelations($table)
     {
-        // Get foreign key relationships
+        // Fetch foreign key relationships for the specified table
         $relations = get_table_relations($table, $this->conn_key);
+
+        // Return the relations as a JSON response
         return response()->json($relations);
     }
 
+    /**
+     * Retrieve column details for a given table.
+     *
+     * @param string $table The name of the table.
+     * @return \Illuminate\Http\JsonResponse JSON response with column details.
+     */
     public function getColumns($table)
     {
         $is_join_table = request()?->is_join_table == 'yes' ? 'yes' : 'no';
 
-        // Validate table name to prevent SQL injection
+        // Validate if the table exists to prevent SQL injection
         if (!in_array($table, get_table_list($this->conn_key))) {
             return response()->json(['error' => 'Invalid table name'], 400);
         }
 
-        if ($is_join_table == 'yes') {
-            $query = "
+        // Define query to retrieve column details
+        $query = "
             SELECT 
                 CONCAT(TABLE_NAME, '.', COLUMN_NAME) as full_name,
                 TABLE_NAME as table_name,
@@ -53,38 +85,37 @@ class QueryBuilderController extends Controller
                 IS_NULLABLE as nullable,
                 COLUMN_DEFAULT as default_value
             FROM information_schema.COLUMNS 
-            WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME != 'id'
-            ORDER BY ORDINAL_POSITION
+            WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
         ";
-        } else {
-            $query = "
-                SELECT 
-                    CONCAT(TABLE_NAME, '.', COLUMN_NAME) as full_name,
-                    TABLE_NAME as table_name,
-                    COLUMN_NAME as name,
-                    COLUMN_COMMENT as comment,
-                    DATA_TYPE as type,
-                    IS_NULLABLE as nullable,
-                    COLUMN_DEFAULT as default_value
-                FROM information_schema.COLUMNS 
-                WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?
-                ORDER BY ORDINAL_POSITION
-            ";
+
+        // Exclude 'id' column for join tables
+        if ($is_join_table == 'yes') {
+            $query .= " AND COLUMN_NAME != 'id'";
         }
+
+        $query .= " ORDER BY ORDINAL_POSITION";
+
         
-
+        // Execute query and fetch column details
         $columns = DB::select($query, [get_database_name($this->conn_key), $table]);
-
+        // Get column comments
         $comments = get_table_columns_comment($table, $this->conn_key);
-
+        // Return response as JSON
         $response = ['columns' => $columns, 'comments' => $comments];
 
         return response()->json($response);
     }
 
+
+    /**
+     * Perform a database search based on provided filters, conditions, and joins.
+     *
+     * @param \Illuminate\Http\Request $request The request containing search parameters.
+     * @return \Illuminate\Http\JsonResponse JSON response with search results.
+     */
     public function search(Request $request)
     {
-
+        // Retrieve request parameters
         $mainTable = $request->input('main_table');
         $joins = $request->input('joins', []);
         $selectedColumns = $request->input('columns', []);
@@ -96,10 +127,10 @@ class QueryBuilderController extends Controller
 
 
         try {
-            // Start building the query
+            // Initialize query builder
             $query = DB::connection($this->conn_key)->table($mainTable);
 
-            // Apply joins
+           // Apply joins
             $tables = [];
             $tables[] = $mainTable;
             foreach ($joins as $join) {
@@ -143,20 +174,21 @@ class QueryBuilderController extends Controller
                 }
             }
 
-            // Get total count
+            // Get total count before pagination
             $totalCount = $query->count();
 
-            // Get results with selected columns
+            // Apply column selection
             if (!empty($selectedColumns)) {
                 $query->select($selectedColumns);
-                // $query->select( arrange_records_column_comment( $selectedColumns ) );
             }
-
+            // Fetch table and column information
             $tableInfo = get_multiple_table_info($tables, $this->conn_key);
             $columns = get_columns_for_listing($mainTable, $tableInfo, $selectedColumns);
 
-
+            // Apply pagination
             $total = $query->get()->count();
+
+            // Get paginated results
             $results = $query->skip($skip)->take($perPage)->get();
 
             return response()->json([
@@ -168,10 +200,6 @@ class QueryBuilderController extends Controller
                 'tableInfo' => $tableInfo,
             ]);
 
-            // return response()->json([
-            //     'data' => $results,
-            //     'total_count' => $totalCount
-            // ]);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Query error',
@@ -181,6 +209,12 @@ class QueryBuilderController extends Controller
 
     }
 
+    /**
+     * Save a query builder section based on the provided data.
+     *
+     * @param \Illuminate\Http\Request $request The request containing form data.
+     * @return \Illuminate\Http\JsonResponse JSON response indicating success or failure.
+     */
     public function save(Request $request)
     {
 
@@ -195,13 +229,13 @@ class QueryBuilderController extends Controller
                 $query_details = (array)json_decode( $req_data[ 'query_details' ] );
             }
 
+            // Get database credentials
             $db_data = config( "database.connections.$this->conn_key" );
-
             $password = $db_data[ 'password' ] ?? null;
             if ( !is_null( $password ) && !empty( $password ) ) {
                 $password = base64_encode( mange_db_pass_prefix() . '-v-' . $password );
             }
-
+             // Prepare data for saving
             $store_data = [ 
                 'title'             => $req_data[ 'title' ] ?? null,
                 'query_details'     => json_encode( $query_details ),
@@ -213,7 +247,8 @@ class QueryBuilderController extends Controller
             ];
 
             $db_key = connect_to_main_db();
-
+            
+            // Insert or update query form
             $if_exists = DB::connection( $db_key )->table( 'query_forms' )->where( 'id', $qry_id )->first();
             if ( $if_exists ) {
                 $in_query_forms = DB::connection( $db_key )->table( 'query_forms' )->where( 'id', $qry_id )->update( $store_data );
@@ -231,7 +266,7 @@ class QueryBuilderController extends Controller
                 'data'      => $query_forms,
             ], 200);
         } catch (\Exception $e) {
-
+                // Improved error handling with better exception catching
             session()->flash('error', 'Failed to save the query details.');
             
             return response()->json([

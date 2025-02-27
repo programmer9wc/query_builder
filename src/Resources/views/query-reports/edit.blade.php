@@ -44,131 +44,133 @@
 </style>
 
 @endsection
-
 @section('content')
+<div class="container">
+    <div class="row">
+        <div class="col-12">
 
-<div class="card">
-
-    <div class="card-header">
-
-        <div class="d-flex justify-content-between">
-            <h2>{{ (int)$query_form?->id > 0 ? 'Edit' : 'Add' }} Query</h2>
-            <div>
-                <a href="{{ route( 'query-report.index' ) }}" class="btn btn-secondary">Back</a>
-                <button type="button" class="btn btn-primary btn-saveQuery">{{ (int)$query_form?->id > 0 ? 'Update' : 'Save' }} Query</button>
-            </div>
-        </div>
-
-    </div> {{-- end card header --}}
-
-    <div class="card-body">
-
-        <div class="mb-3">
-            <h5>Query Title</h5>
             <div class="card">
-                <div class="card-body">
-                    <form id="querySaveForm">
-                        <div class="mb-3">
-                            <label>Title:</label>
-                            <input type="text" name="title" id="queryReportTitle" placeholder="Enter Title" class="form-control mt-1" required value="{{ $query_form?->title ?? '' }}">
-                            <input type="hidden" name="qry_id" value="{{ $query_form?->id ?? 0 }}">
+
+                <div class="card-header">
+
+                    <div class="d-flex justify-content-between">
+                        <h2>{{ (int)$query_form?->id > 0 ? 'Edit' : 'Add' }} Query</h2>
+                        <div>
+                            <a href="{{ route( 'query-report.index' ) }}" class="btn btn-secondary">Back</a>
+                            <button type="button" class="btn btn-primary btn-saveQuery">{{ (int)$query_form?->id > 0 ? 'Update' : 'Save' }} Query</button>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <h5>Query Details</h5>
-            <div class="card">
-                <div class="card-body">
-                    <form id="queryForm">
-                        <!-- Main Table Selection -->
-                        <div class="mb-3">
-                            <label>Select Main Table:</label>
-                            <select class="form-select main_table" id="mainTableSelect" name="main_table">
-                                <option value="">Select a table</option>
-                                @foreach($tables as $table)
-                                    @if(is_array($tables_data) && array_key_exists($table, $tables_data) && !is_null($tables_data[$table]->table_comment) && !empty($tables_data[$table]->table_comment))
-                                        <option value="{{ $table }}">{{ $tables_data[$table]->table_comment }} ( {{ $table }} )</option>
-                                    @else
-                                        <option value="{{ $table }}">{{ $table }}</option>
-                                    @endif
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <!-- Table Relationships -->
-                        <div id="tableRelationships" class="table-relationships" style="display: none;">
-                            <h6>Available Relationships:</h6>
-                            <div id="relationshipsList"></div>
-                        </div>
-
-                        <!-- Join Tables Section -->
-                        <div class="mb-3">
-                            <label>Table Joins:</label>
-                            <div id="joinsContainer"></div>
-                            <button type="button" class="btn btn-secondary btn-sm" id="addJoin" disabled>Add Join</button>
-                        </div>
-
-                        <!-- Column Selection -->
-                        <div class="mb-3">
-                            <label>Select Columns:</label>
-                            <div id="columnSelect" class="border p-3 d-flex align-items-start">
-                                <!-- Columns will be populated dynamically -->
-                            </div>
-                        </div>
-
-                        <!-- Conditions -->
-                        <div class="mb-3">
-                            <label>Conditions:</label>
-                            <div id="conditions">
-                                <div class="condition-card mb-2">
-                                    <span class="remove-condition" style="font-size: 25px;">&times;</span>
-                                    <div class="row">
-                                        <div class="col-md-3">
-                                            <select class="form-select condition-column" name="conditions[0][column]">
-                                                <option value="">Select Column</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <select class="form-select condition-operator" name="conditions[0][operator]">
-                                                <option value="=">=</option>
-                                                <option value="<"><</option>
-                                                <option value=">">></option>
-                                                <option value="LIKE">LIKE</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <input type="text" class="form-control condition-value" name="conditions[0][value]" placeholder="Value">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-secondary btn-sm" id="addCondition">Add Condition</button>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Search</button>
-                    </form>
-
-                    <!-- Results -->
-                    {{-- <div class="mt-4 mb-3" id="resultsSummary" style="display: none;"></div> --}}
-                    <div class="table-responsive mt-4">
-                        {{-- <table class="table" id="resultsTable">
-                            <thead><tr id="resultsHeader"></tr></thead>
-                            <tbody id="resultsBody"></tbody>
-                        </table> --}}
-                        <div id="resultsTable"></div>
                     </div>
 
-                </div>
+                </div> {{-- end card header --}}
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <h5>Query Title</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="querySaveForm">
+                                    <div class="mb-3">
+                                        <label>Title:</label>
+                                        <input type="text" name="title" id="queryReportTitle" placeholder="Enter Title" class="form-control mt-1" required value="{{ $query_form?->title ?? '' }}">
+                                        <input type="hidden" name="qry_id" value="{{ $query_form?->id ?? 0 }}">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <h5>Query Details</h5>
+                        <div class="card">
+                            <div class="card-body">
+                                <form id="queryForm">
+                                    <!-- Main Table Selection -->
+                                    <div class="mb-3">
+                                        <label>Select Main Table:</label>
+                                        <select class="form-select main_table" id="mainTableSelect" name="main_table">
+                                            <option value="">Select a table</option>
+                                            @foreach($tables as $table)
+                                            @if(is_array($tables_data) && array_key_exists($table, $tables_data) && !is_null($tables_data[$table]->table_comment) && !empty($tables_data[$table]->table_comment))
+                                            <option value="{{ $table }}">{{ $tables_data[$table]->table_comment }} ( {{ $table }} )</option>
+                                            @else
+                                            <option value="{{ $table }}">{{ $table }}</option>
+                                            @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <!-- Table Relationships -->
+                                    <div id="tableRelationships" class="table-relationships" style="display: none;">
+                                        <h6>Available Relationships:</h6>
+                                        <div id="relationshipsList"></div>
+                                    </div>
+
+                                    <!-- Join Tables Section -->
+                                    <div class="mb-3">
+                                        <label>Table Joins:</label>
+                                        <div id="joinsContainer"></div>
+                                        <button type="button" class="btn btn-secondary btn-sm" id="addJoin" disabled>Add Join</button>
+                                    </div>
+
+                                    <!-- Column Selection -->
+                                    <div class="mb-3">
+                                        <label>Select Columns:</label>
+                                        <div id="columnSelect" class="border p-3 d-flex align-items-start">
+                                            <!-- Columns will be populated dynamically -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Conditions -->
+                                    <div class="mb-3">
+                                        <label>Conditions:</label>
+                                        <div id="conditions">
+                                            <div class="condition-card mb-2">
+                                                <span class="remove-condition" style="font-size: 25px;">&times;</span>
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <select class="form-select condition-column" name="conditions[0][column]">
+                                                            <option value="">Select Column</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <select class="form-select condition-operator" name="conditions[0][operator]">
+                                                            <option value="=">=</option>
+                                                            <option value="<"><</option>
+                                                                <option value=">">></option>
+                                                                <option value="LIKE">LIKE</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <input type="text" class="form-control condition-value" name="conditions[0][value]" placeholder="Value">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-secondary btn-sm" id="addCondition">Add Condition</button>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Search</button>
+                                    </form>
+
+                                    <!-- Results -->
+                                    
+                                    <div class="table-responsive mt-4">
+                                        
+                                        <div id="resultsTable"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> {{-- end card body --}}
+                </div> {{-- end card main --}}
+
             </div>
         </div>
-
-    </div> {{-- end card body --}}
-</div> {{-- end card main --}}
-
-@endsection
+    </div>
+    @endsection
 
 @section('scripts')
 
@@ -228,7 +230,6 @@
                 resetColumnSelection();
                 updateColumnSelection();
             }
-            // $('.btn-saveQueryModal').prop('disabled', ( table ? false : true ));
         });
 
         function loadTableRelations(table) {
@@ -508,7 +509,6 @@
                             </label>
                         </div>
                     `;
-                                // ${column.comment ? `<small class="text-muted">(${column.comment})</small>` : ''}
                 });
                 columnHtml += `</div>`;
                 columnHtml += `</div>`;

@@ -1,64 +1,34 @@
 @extends('wc_querybuilder::layout')
 
 @section('css')
-
-<style type="text/css">
-
-</style>
-
 @endsection
-
 @section('content')
+<div class="container">
+    <div class="row">
+        <div class="col-12">
 
-<div class="d-flex justify-content-between">
-    <h2>Query Reports</h2>
-    <div>
-        <a href="{{ route( 'query-builder.index' ) }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Query</a>
-    </div>
-</div>
+            <div class="d-flex justify-content-between">
+                <h2>Query Reports</h2>
+                <div>
+                    <a href="{{ route( 'query-builder.index' ) }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Query</a>
+                </div>
+            </div>
 
-<table id="reportsTable" class="table table-striped table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Reports</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+            <table id="reportsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Reports</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
 
-<!-- Modal -->
-{{-- <div class="modal fade" id="addRecordModal" tabindex="-1" aria-labelledby="addRecordModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="#" method="POST">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addRecordModalLabel">Add New Record</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </form>
         </div>
     </div>
-</div> --}}
-
-
+</div>
 @endsection
 
 @section('scripts')
