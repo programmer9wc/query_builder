@@ -108,7 +108,7 @@ class QueryReportsController extends Controller
         $query_details = convert_bracketed_keys_to_array($inputArray);
 
         // Return view with structured data
-        return view('wc_querybuilder::query-reports.edit', compact('tables', 'query_form', 'query_details', 'tables_data'));
+        return view('wc_querybuilder::query-reports.operation', compact('tables', 'query_form', 'query_details', 'tables_data'));
     }
 
     /**

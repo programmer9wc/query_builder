@@ -153,7 +153,9 @@ function get_skip_tables()
 		'jobs',
 		'migrations',
 		'password_reset_tokens',
+		'personal_access_tokens',
 		'sessions',
+		'query_forms',
 	];
 }
 

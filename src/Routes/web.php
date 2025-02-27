@@ -9,7 +9,7 @@ use Programmer9WC\QueryBuilder\Http\Controllers\QueryReportsController;
  * Group routes under the 'web' middleware for session management, CSRF protection, etc.
  */
 // Route::middleware(['web','auth'])->group(function () {
-Route::middleware(['web'])->group(function () {
+Route::middleware(['web','auth'])->group(function () {
 
 
     /**

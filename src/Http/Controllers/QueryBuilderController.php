@@ -41,7 +41,7 @@ class QueryBuilderController extends Controller
 
         // Return the view with retrieved data
 
-        return view('wc_querybuilder::query-reports.edit', compact('tables', 'query_form', 'query_details', 'tables_data'));
+        return view('wc_querybuilder::query-reports.operation', compact('tables', 'query_form', 'query_details', 'tables_data'));
     }
 
     /**
